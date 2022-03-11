@@ -1,6 +1,9 @@
 <?php
-    require_once 'classes/captcha_class.php';
+    spl_autoload_register(
+        function($classname) {
+            require_once "classes/{$classname}_class.php";
+        }
+    );
     
-    //Update (create new) captcha
     Captcha::createCaptcha();
 ?>

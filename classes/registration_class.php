@@ -1,5 +1,9 @@
 <?php
-    require_once 'classes/captcha_class.php';
+    spl_autoload_register(
+        function($classname) {
+            require_once "classes/{$classname}_class.php";
+        }
+    );
 
     class Registration {
         private $email;
@@ -47,7 +51,10 @@
                     VALUES ('$this->email', MD5('$this->password'))";
                     $mysqli->query($query);
                     $mysqli->close();
-                    return 'Вы успешно зарегистрировались';
+                    if (!session_id()) session_start();
+                    $_SESSION['flag_autorization']  = true;
+                    $_SESSION['user_email'] = $this->email;
+                    return 1; // SUCCESSFUL REGISTRATION
 
                 } else throw new Exception('Какие-то поля не заполнены');
             } catch (Exception $e) {

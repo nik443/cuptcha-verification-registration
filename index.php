@@ -1,16 +1,28 @@
 <?php
-    require_once 'classes/registration_class.php';
+    spl_autoload_register(
+        function($classname) {
+            require_once "classes/{$classname}_class.php";
+        }
+    );
     
     if (isset($_POST['registration_form'])) {
         $registration = new Registration($_POST['email'], $_POST['password'], $_POST['repiat_password'], $_POST['captcha_code']);
-        echo $registration->check_data();
+        $successful_reg = $registration->check_data();
+        if ($successful_reg == 1) {
+            echo 'Вы успешно зарегистрировались. ';
+        };
     }
 
-    $captcha_img_path = 'captcha.php';
-    /* if (isset($_GET['update_captcha']) && $_GET['update_captcha'] == 'update') {
-        Captcha::createCaptcha();
-        $captcha_img_path = 'captcha.php';
-    } */
+    if (!session_id()) session_start();
+    if (isset($_SESSION['flag_autorization']) && $_SESSION['flag_autorization'] == true) {
+        echo 'Приветствуем, ' . $_SESSION['user_email'];
+        ?> <a href="index.php?exit_acc=exit">Выйти из аккаунта</a> <?php
+    }
+
+    if (isset($_GET['exit_acc']) && $_GET['exit_acc'] == 'exit') {
+        unset($_SESSION['flag_autorization']);
+        unset($_SESSION['user_email']);
+    }
 ?>
 
 <div class="registration">
@@ -29,7 +41,7 @@
             <input type="text" name="captcha_code">
         </div>
         <div>
-            <img src="<?= $captcha_img_path ?>" alt="Captcha">
+            <img src="captcha.php" alt="Captcha">
             <a href="index.php?update_captcha=update">Не видно кода</a>
         </div>
         <div>
